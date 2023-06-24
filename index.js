@@ -1,6 +1,6 @@
 function state(initialValue) {
     let value = initialValue
-    
+
     function getValue() {
         return value
     }
@@ -8,13 +8,13 @@ function state(initialValue) {
     function setValue(newValue) {
         value = newValue
     }
-    
+
     return [getValue, setValue]
 }
 
 const [database, setDatabase] = state([
-   {
-    id: 1,
+    {
+        id: 1,
         nome: "televisão",
         preco: 2500
     },
@@ -37,6 +37,18 @@ const [database, setDatabase] = state([
 
 const [cart, setCart] = state([])
 
+function cartDataAnalysis() {
+    const cartLocalJson = localStorage.getItem("cart")
+
+    if (cartLocalJson) {
+        const cartLocal = JSON.parse(cartLocalJson)
+
+        return setCart(cartLocal)
+    }
+}
+
+cartDataAnalysis()
+
 function showProducts(products = database()) {
     const container = document.querySelector("#produtos");
 
@@ -54,19 +66,25 @@ function showProducts(products = database()) {
             `
         );
     });
-
     return container;
 }
+
 function addToCart(id, products = database()) {
- const selectedProduct = products.find((element) => element.id === id)
+    const selectedProduct = products.find((element) => element.id === id)
 
- setCart([...cart(), selectedProduct])
+    setCart([...cart(), selectedProduct])
 
- return showProductsInCart()
+    const productsJson = JSON.stringify(cart())
+
+    localStorage.setItem("cart", productsJson)
+
+    console.log(productsJson)
+
+    return showProductsInCart()
 }
 
 function showProductsInCart(products = cart()) {
-    const container = document.querySelector("#carrinho") 
+    const container = document.querySelector("#carrinho")
 
     container.innerHTML = ''
 
@@ -91,8 +109,13 @@ function removeFromCart(id, products = cart()) {
     const newCartProducts = [...products]
     newCartProducts.splice(findProduct, 1)
     setCart(newCartProducts)
-    return showProductsInCart ()
-}
 
+    const productsJSON = JSON.stringify(cart())
+
+    localStorage.setItem("cart", productsJSON)
+
+    return showProductsInCart()
+}
 showProducts()
+showProductsInCart()
 
